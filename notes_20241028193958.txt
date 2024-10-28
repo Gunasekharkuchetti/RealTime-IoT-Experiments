@@ -1,0 +1,39 @@
+10.28 7:39 PM
+// Pin Definitions
+const int irSensorPin = 2;       // IR sensor connected to digital pin 2
+const int relayPin = 3;          // Relay module connected to digital pin 3
+
+// Variables
+int motionCounter = 0;           // Counter for motion detections
+bool bulbState = false;          // To store bulb on/off state
+int sensorState = 0;             // Variable for reading IR sensor status
+int lastSensorState = 0;         // Variable for storing the last IR sensor state
+
+void setup() {
+  pinMode(irSensorPin, INPUT);   // Set IR sensor as input
+  pinMode(relayPin, OUTPUT);     // Set relay as output
+  Serial.begin(9600);            // Initialize serial communication
+}
+
+void loop() {
+  sensorState = digitalRead(irSensorPin); // Read IR sensor state
+
+  // Check if motion is detected
+  if (sensorState == HIGH && lastSensorState == LOW) {
+    motionCounter++;               // Increment motion counter
+    bulbState = !bulbState;        // Toggle bulb state
+    digitalWrite(relayPin, bulbState ? HIGH : LOW); // Update relay
+
+    // Print status to the Serial Monitor
+    Serial.print("Motion detected! Count: ");
+    Serial.println(motionCounter);
+    Serial.print("Bulb State: ");
+    Serial.println(bulbState ? "ON" : "OFF");
+
+    // Delay to prevent multiple counts in quick succession
+    delay(500);
+  }
+
+  // Update the last sensor state
+  lastSensorState = sensorState;
+}
